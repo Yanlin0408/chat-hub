@@ -5,11 +5,6 @@ const server = http.createServer(app);
 const {Server} = require("socket.io");
 const io = new Server(server);
 
-/*const server = require("http").createServer(app);
-const io = require("socket.io").listen(server);
-const port = 3000;
-*/
-
 io.on("connection", socket => {
     console.log("a user connected :D");
     socket.on("yo", (message) => {
