@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState,useEffect} from 'react'
 import { StyleSheet, TextInput, Text, View, KeyboardAvoidingView,Platform, TouchableWithoutFeedback,Keyboard } from 'react-native'
 import { Input, Image, Button} from "react-native-elements"
 import {StatusBar} from "expo-status-bar"
@@ -6,14 +6,31 @@ import DarkTheme from "../constant/darkTheme"
 import Logo from "../assets/logo"
 import InputStyle from "../constant/inputContainer"
 import io from "socket.io-client"
+import * as firebase from "firebase";
+import {auth} from "../firebase"
 
 
 const LoginScreen = ({navigation}) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    // 看看这个能不能改一改，小改可以，改成可以退出
+    // Official doc: an observer for changes to the user's sign-in state.
+    // a listen knows user state(logined in or not) in firebase when you refresh/first render this page
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((authUser) => {
+            if(authUser) {
+                console.log(authUser);
+                navigation.replace("Home");
+            }
+        });
+
+        // firebase stop listening onAuthStateChanged (clean up) first
+        return unsubscribe;
+    }, []);
+
     const signIn = () => {
-        
+        auth.signInWithEmailAndPassword(email, password).catch(error => alert(error));
     }
 
     return (
@@ -30,12 +47,15 @@ const LoginScreen = ({navigation}) => {
                         style = {styles.inputContainer} 
                         placeholderTextColor={DarkTheme.grey} 
                         placeholder="Email"/>
-                        <TextInput 
+                        <TextInput
+                        onChangeText={e => {setPassword(e)}} 
                         fontSize = {18}
                         style = {styles.inputContainer} 
                         placeholderTextColor={DarkTheme.grey} 
                         secureTextEntry = {true}
-                        placeholder="Password"/>
+                        placeholder="Password"
+                        onSubmitEditing = {signIn}
+                        />
                         <View style = {{height:5}}/>
                         <Button
                         title="Login"

@@ -6,11 +6,13 @@ import { Input, Image, Button} from "react-native-elements"
 import LoginScreen from "./LoginScreen"
 import InputStyle from "../constant/inputContainer"
 import io from "socket.io-client"
+import * as firebase from "firebase";
+import {auth} from "../firebase"
 
 const RegisterScreen = ({navigation}) => {
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
-    const [password, setPassword] = useState("");
+    const [password, setPassword] = useState("123123");
     const [imageUrl, setImageUrl] = useState("");
 
     const socket = io("http://192.168.1.71:3000/");
@@ -18,7 +20,23 @@ const RegisterScreen = ({navigation}) => {
     socket.emit("yo","heyheyhey");
 
     const register = () => {
-
+        auth
+        .createUserWithEmailAndPassword(email, password)   //probably have some problem
+        .then((authUser) => {
+            console.log(authUser.user);
+            // console.log("---------yo---",password);
+            // console.log("---------yo---",name);
+            // console.log("===== displayname")
+            // console.log(authUser.user.displayName);
+            // console.log("===== providedrID")
+            // console.log(authUser.user.providerData);
+            // console.log("---------------------");
+            authUser.user.updateProfile({
+                displayName: name,
+                photoURL: imageUrl || "http://img.crcz.com/allimg/202003/03/1583242569661699.jpg",
+            });
+        })
+        .catch((error) => alert(error.message));
     };
 
     useLayoutEffect(() => {
@@ -38,22 +56,6 @@ const RegisterScreen = ({navigation}) => {
         });
         
     }, [navigation]);
-
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         setName("bitch");
-    //         // navigation.navigate("Login");
-    //         navigation.navigate({name: LoginScreen});
-    //     }, 3000);
-        
-    // }, [name])
-
-    // useLayoutEffect(() => {
-    //     effect
-    //     return () => {
-    //         cleanup
-    //     };
-    // }, [input])
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style = {styles.container}>
@@ -86,14 +88,21 @@ const RegisterScreen = ({navigation}) => {
                             style = {styles.input}
                             onChangeText = {(text) => setEmail(text)}
                         />
-                        <TextInput
+                        {/* <TextInput
                             secureTextEntry
                             value = {password}
                             placeholder = "Password"
                             placeholderTextColor={DarkTheme.grey}
                             style = {styles.input}
                             onChangeText = {(text) => setPassword(text)}
-                        />
+                        /> */}
+                        {/* <Input
+                            placeholder="password"
+                            type = "password"
+                            secureTextEntry
+                            value={password}
+                            onChangeText={(text) => setPassword(text)}
+                        /> */}
                         <TextInput
                             value = {imageUrl}
                             placeholder = "Profile Picture Url (optional)"
