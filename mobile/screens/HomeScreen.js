@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ScrollView,SafeAreaView,TouchableOpacity } from
 import { Avatar } from 'react-native-elements/dist/avatar/Avatar'
 import CustomListItem from '../component/CustomListItem'
 import DarkTheme from "../constant/darkTheme"
+import { AntDesign, SimpleLineIcons} from "@expo/vector-icons"
 import {auth, db} from "../firebase"
 
 const HomeScreen = ({navigation}) => {
@@ -27,8 +28,27 @@ const HomeScreen = ({navigation}) => {
                     </TouchableOpacity>
                 </View>
             ),
+            headerRight: () => (
+                <View 
+                    style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    width: 80,
+                    marginRight: 20,
+                }}>
+                    <TouchableOpacity activeOpacity={0.5}>
+                        <AntDesign name='camerao' size={24} color = 'white' style={{ marginLeft: 25}}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        onPress={() => navigation.navigate("AddChat")}
+                        activeOpacity={0.5}
+                    >
+                        <SimpleLineIcons name='pencil' size={24} color = 'white' style={{ marginRight: -7}}/>
+                    </TouchableOpacity>
+                </View>
+            ),
         });
-    }, []);
+    }, [navigation]);
 
     return (
         <SafeAreaView>
