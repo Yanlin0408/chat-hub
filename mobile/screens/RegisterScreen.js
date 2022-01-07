@@ -23,7 +23,7 @@ const RegisterScreen = ({navigation}) => {
         auth
         .createUserWithEmailAndPassword(email, password)   //probably have some problem
         .then((authUser) => {
-            console.log(authUser.user);
+            // console.log(authUser.user);
             authUser.user.updateProfile({
                 displayName: name,
                 photoURL: imageUrl || "http://img.crcz.com/allimg/202003/03/1583242569661699.jpg",
