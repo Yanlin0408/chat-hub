@@ -2,25 +2,36 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements';
 
-const CustomListItem = ({id, chatName, enterChat}) => {
+const CustomListItem = ({id, chatName, lastTime, lastMessage, lastPic, enterChat}) => {
+
+
+
     return (
         <ListItem onPress = {() => enterChat(id, chatName)} key = {id} bottomDivider>
             <Avatar
                 rounded
+                size = "medium"
                 source = {{
                     uri:
-                    "http://img.duoziwang.com/2021/04/08260845108843.jpg",
+                    lastPic
+                    ?lastPic
+                    :"https://cdn.iconscout.com/icon/premium/png-256-thumb/chat-2469467-2043406.png",
+                    // ?
+
+                    // :
+                    // "https://cdn.iconscout.com/icon/premium/png-256-thumb/chat-2469467-2043406.png",
                 }}
 
             />
-            <ListItem.Content>
+            <ListItem.Swipeable>
                 <ListItem.Title style={{fontWeight:"800"}}>
                     {chatName}
                 </ListItem.Title>
-                <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-                    this is a test subtitle
+                <ListItem.Subtitle right={"true"} numberOfLines={1} ellipsizeMode="tail">
+                    {/* {chatData.collection('messages').data().messages[0]} */}
+                    {lastMessage}
                 </ListItem.Subtitle>
-            </ListItem.Content>
+            </ListItem.Swipeable>
         </ListItem>
     )
 }

@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {Button, Input} from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome"; 
+import * as firebase from "firebase";
 import {auth, db} from "../firebase";
 
 const AddChatScreen = ({navigation}) => {
@@ -19,6 +20,7 @@ const AddChatScreen = ({navigation}) => {
         .collection('chats')
         .add({
             chatName: input,
+            lastTimeUpdate: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
             navigation.goBack();

@@ -25,9 +25,8 @@ const ChatScreen = ({navigation, route}) => {
                     alignItems: "center",
                     }}
                 >
-                    {/* <Avatar rounded source = {{uri: }}/> */}
-                    <Text style = {{color: "white", marginLeft:10, fontWeight: "500"}}
-                    >
+                    <Avatar rounded source = {{uri: messages[messages.length - 1]?messages[messages.length -1].data.photoURL:"https://cdn.iconscout.com/icon/premium/png-256-thumb/chat-2469467-2043406.png"}}/>
+                    <Text style = {{color: "white", marginLeft:10, fontWeight: "500"}}>
                     {route.params.chatName}
                     </Text>
                 </View>),
@@ -46,7 +45,7 @@ const ChatScreen = ({navigation, route}) => {
             //     </View>
             // )
         });
-    }, [navigation]);
+    }, [navigation, messages]);
 
     const sendMessage = () => {
         Keyboard.dismiss();  
@@ -59,12 +58,15 @@ const ChatScreen = ({navigation, route}) => {
             photoURL: auth.currentUser.photoURL
         })
 
+        db.collection('chats').doc(route.params.id).set({
+            lastTimeUpdate: firebase.firestore.FieldValue.serverTimestamp(),
+            lastTimePic: auth.currentUser.photoURL,
+            chatName: route.params.chatName,
+            lastMessage: input,
+        })
+
         setInput('');
     };
-
-    // useLayoutEffect(() => {
-
-    // }, [route])
 
     useEffect(() => {
         const unsubscribe = db
@@ -83,6 +85,7 @@ const ChatScreen = ({navigation, route}) => {
 
         return unsubscribe;
     }, [route]);
+
 
     return (
         <SafeAreaView style = {{flex:1, backgroundColor: "black"}}>
@@ -122,7 +125,8 @@ const ChatScreen = ({navigation, route}) => {
                             value = {input}
                             onChangeText = {(text) => setInput(text)}
                             onSubmitEditing = {sendMessage}
-                            placeholder = " chathub message"
+                            // placeholder = " chathub message"
+                            placeholder = {route.params.chatData}
                             style = {styles.textInput}
                         />
                         <TouchableOpacity
