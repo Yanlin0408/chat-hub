@@ -4,20 +4,37 @@ import { Avatar } from 'react-native-elements/dist/avatar/Avatar';
 import { AntDesign, SimpleLineIcons, Ionicons} from "@expo/vector-icons"
 import { StatusBar } from 'expo-status-bar';
 import DarkTheme from "../constant/darkTheme"
+import io from "socket.io-client"
 import * as firebase from "firebase";
 import { auth, db } from "../firebase";
+import { Logs } from 'expo'
 // import firebase from 'firebase';
 
-
+Logs.enableExpoCliLogging()
 const ChatScreen = ({navigation, route}) => {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState([]);
+
+    // const backToHome = () => {
+    //     navigation.replace("Home",{
+    //         lastT: messages[messages.length -1].data.timestamp.toDate().toString(),
+    //     });
+    //     console.log(messages[messages.length -1].data.timestamp.toDate().toString());
+    // }
 
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Chat",
             headerBackTitleVisible: false,
             headerTitleAligh: "left",
+            // headerLeft: () => (
+            //     <View style={{ marginLeft: 5}}>
+            //         <TouchableOpacity onPress={backToHome} activeOpacity={0.5}>
+            //             {/* <Avatar rounded source={{uri: auth?.currentUser?.photoURL}}/> */}
+            //             <Text>back</Text>
+            //         </TouchableOpacity>
+            //     </View>
+            // ),
             headerTitle: () => (
                 <View 
                     style = {{
@@ -25,7 +42,12 @@ const ChatScreen = ({navigation, route}) => {
                     alignItems: "center",
                     }}
                 >
-                    <Avatar rounded source = {{uri: messages[messages.length - 1]?messages[messages.length -1].data.photoURL:"https://cdn.iconscout.com/icon/premium/png-256-thumb/chat-2469467-2043406.png"}}/>
+                    <Avatar 
+                        rounded 
+                        source = {{uri: messages[messages.length - 1]
+                        ?messages[messages.length -1]
+                        .data.photoURL:"https://cdn.iconscout.com/icon/premium/png-256-thumb/chat-2469467-2043406.png"}}
+                    />
                     <Text style = {{color: "white", marginLeft:10, fontWeight: "500"}}>
                     {route.params.chatName}
                     </Text>
@@ -50,6 +72,7 @@ const ChatScreen = ({navigation, route}) => {
     const sendMessage = () => {
         Keyboard.dismiss();  
 
+        // update field in "message"
         db.collection('chats').doc(route.params.id).collection('messages').add({
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             message: input,
@@ -58,6 +81,7 @@ const ChatScreen = ({navigation, route}) => {
             photoURL: auth.currentUser.photoURL
         })
 
+        // update field in "chat"
         db.collection('chats').doc(route.params.id).set({
             lastTimeUpdate: firebase.firestore.FieldValue.serverTimestamp(),
             lastTimePic: auth.currentUser.photoURL,
@@ -75,13 +99,14 @@ const ChatScreen = ({navigation, route}) => {
         .collection("messages")
         .orderBy("timestamp","asc")
         .onSnapshot((snapshot) => 
-        setMessages(
-            //chats is set to be objects referring to every doc in snapshot
-            snapshot.docs.map((doc) => ({
-                id: doc.id,
-                data: doc.data(),
-            }))
-        )); 
+            setMessages(
+                //chats is set to be objects referring to every doc in snapshot
+                snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    data: doc.data(),
+                }))
+            )
+        ); 
 
         return unsubscribe;
     }, [route]);
@@ -98,11 +123,6 @@ const ChatScreen = ({navigation, route}) => {
                 <TouchableWithoutFeedback onPress = {Keyboard.dismiss}>
                 <>
                     <ScrollView contentContainerStyle = {{paddingTop: 15}}>
-                        {/* {messages.map((ms) => {
-                            if(ms.data.displayName == auth.currentUser.displayName)
-                                return <Text style={{ marginLeft: 70}}>{ms.data.message}</Text>
-                            return <Text>{ms.data.message}</Text>
-                            })} */}
                         {messages.map(({id,data}) => (
                             data.email === auth.currentUser.email
                             ?
@@ -125,8 +145,8 @@ const ChatScreen = ({navigation, route}) => {
                             value = {input}
                             onChangeText = {(text) => setInput(text)}
                             onSubmitEditing = {sendMessage}
-                            // placeholder = " chathub message"
-                            placeholder = {route.params.chatData}
+                            placeholder = " chathub message"
+                            // placeholder = {route.params.chatData}
                             style = {styles.textInput}
                         />
                         <TouchableOpacity
@@ -173,13 +193,10 @@ const styles = StyleSheet.create({
         position: "relative",
         color: "white",
         marginTop: -20,
-        // paddingTop: -15,
         padding: 5,
         paddingLeft: 10,
         paddingRight: 10,
         paddingBottom: 10,
-        // paddingTop: -20,
-        // paddingBottom: 40,
     },
     sender: {
         backgroundColor: DarkTheme.grey,

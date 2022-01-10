@@ -5,9 +5,12 @@ import CustomListItem from '../component/CustomListItem'
 import DarkTheme from "../constant/darkTheme"
 import { AntDesign, SimpleLineIcons} from "@expo/vector-icons"
 import {auth, db} from "../firebase"
+import { Logs } from 'expo'
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({navigation, route}) => {
     const [chats, setChats] = useState([]);
+
+    
 
     const signOutUser = () => {
         auth.signOut().then(() => {
@@ -21,36 +24,6 @@ const HomeScreen = ({navigation}) => {
             chatName,
         });
     }
-
-    useEffect(() => {
-        const unsubscribe = db.collection("chats").orderBy("lastTimeUpdate","desc").onSnapshot((snapshot) => 
-        setChats(
-            //chats is set to be an array of objects referring to every doc in snapshot
-            snapshot.docs.map((doc) => ({
-                id: doc.id,
-                data: doc.data(),
-            }))
-        )); 
-
-        return unsubscribe;
-    }, []);
-
-    // useEffect(() => {
-    //     const unsubscribe = db
-    //     .collection("chats")
-    //     .doc(route.params.id) //how to be specific about which chat it is?
-    //     .collection("messages")
-    //     .orderBy("timestamp","asc")
-    //     .onSnapshot((snapshot) => 
-    //     setChats(
-    //         //chats is set to be objects referring to every doc in snapshot
-    //         snapshot.docs.map((doc) => ({
-    //             lastPic: doc.data()
-    //         }))
-    //     )); 
-
-    //     return unsubscribe;
-    // }, [route]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -88,7 +61,18 @@ const HomeScreen = ({navigation}) => {
         });
     }, [navigation]);
 
+    useEffect(() => {
+        const unsubscribe = db.collection("chats").orderBy("lastTimeUpdate","desc").onSnapshot((snapshot) => 
+        setChats(
+            //chats is set to be an array of objects referring to every doc in snapshot
+            snapshot.docs.map((doc) => ({
+                id: doc.id,
+                data: doc.data(),
+            }))
+        ));
 
+        // return unsubscribe;
+    }, []);
 
     return (
         <SafeAreaView>
@@ -99,10 +83,13 @@ const HomeScreen = ({navigation}) => {
                         id={chat.id} 
                         chatName={chat.data.chatName} 
                         lastPic = {chat.data.lastTimePic}
-                        lastTime = {chat.data.lastTimeUpdate}
+                        // lastTime = {chat.data.lastTimeUpdate}"fuck"
+                        lastTime = {
+                            chat.data.lastTimeUpdate == null || chat.data.lastTimeUpdate == undefined
+                            ?"fuck"
+                            :chat.data.lastTimeUpdate.toDate().toString()
+                        }
                         lastMessage = {chat.data.lastMessage}
-                        // lastMsgPic={chat.data.messages[messages.length - 1].data.photoURL} 
-                        // lastMsg={chat.data.messages[messages.length - 1].data.message} 
                         enterChat = {enterChat}
                     />
                 ))}
