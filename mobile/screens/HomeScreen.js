@@ -5,12 +5,11 @@ import CustomListItem from '../component/CustomListItem'
 import DarkTheme from "../constant/darkTheme"
 import { AntDesign, SimpleLineIcons} from "@expo/vector-icons"
 import {auth, db} from "../firebase"
+import io from "socket.io-client"
 import { Logs } from 'expo'
 
 const HomeScreen = ({navigation, route}) => {
     const [chats, setChats] = useState([]);
-
-    
 
     const signOutUser = () => {
         auth.signOut().then(() => {
@@ -61,7 +60,7 @@ const HomeScreen = ({navigation, route}) => {
         });
     }, [navigation]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const unsubscribe = db.collection("chats").orderBy("lastTimeUpdate","desc").onSnapshot((snapshot) => 
         setChats(
             //chats is set to be an array of objects referring to every doc in snapshot
@@ -71,7 +70,12 @@ const HomeScreen = ({navigation, route}) => {
             }))
         ));
 
-        // return unsubscribe;
+        const socket = io("http://192.168.1.71:3000/");
+        socket.connect();
+        socket.emit("user",auth?.currentUser?.displayName);
+        // socket.emit("user","rrr");
+
+        return unsubscribe;
     }, []);
 
     return (

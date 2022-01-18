@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useState, useEffect} from 'react'
+import React, {useLayoutEffect, useState, useEffect, useRef} from 'react'
 import { TouchableOpacity, TouchableWithoutFeedback, StyleSheet,TextInput, Text, View, SafeAreaView, KeyboardAvoidingView,Platform, ScrollView, Keyboard } from 'react-native'
 import { Avatar } from 'react-native-elements/dist/avatar/Avatar';
 import { AntDesign, SimpleLineIcons, Ionicons} from "@expo/vector-icons"
@@ -15,26 +15,13 @@ const ChatScreen = ({navigation, route}) => {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState([]);
 
-    // const backToHome = () => {
-    //     navigation.replace("Home",{
-    //         lastT: messages[messages.length -1].data.timestamp.toDate().toString(),
-    //     });
-    //     console.log(messages[messages.length -1].data.timestamp.toDate().toString());
-    // }
+    
 
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Chat",
             headerBackTitleVisible: false,
             headerTitleAligh: "left",
-            // headerLeft: () => (
-            //     <View style={{ marginLeft: 5}}>
-            //         <TouchableOpacity onPress={backToHome} activeOpacity={0.5}>
-            //             {/* <Avatar rounded source={{uri: auth?.currentUser?.photoURL}}/> */}
-            //             <Text>back</Text>
-            //         </TouchableOpacity>
-            //     </View>
-            // ),
             headerTitle: () => (
                 <View 
                     style = {{
@@ -88,10 +75,12 @@ const ChatScreen = ({navigation, route}) => {
             chatName: route.params.chatName,
             lastMessage: input,
         })
+        console.log("----aaaa ---");
 
         setInput('');
     };
 
+        // if we choose to render chat messages from onSnapshot
     useEffect(() => {
         const unsubscribe = db
         .collection("chats")
@@ -107,10 +96,21 @@ const ChatScreen = ({navigation, route}) => {
                 }))
             )
         ); 
+        
+        // 在这，如果想读完数据之后再 unsubscribe, 
+        // 直接呼叫 unsubscribe 不行，因为都是同步，
+        // unsubscribe 不会等我们拿到 onSnapshot 再执行
+        // 所以用 setTimeout, 把 unsubscribe 放入异步队列，就能把顺序设定好
+
+        // setTimeout(() => {
+        //     unsubscribe();
+        // }, 2000);
 
         return unsubscribe;
     }, [route]);
 
+
+    const scrollRef = useRef();
 
     return (
         <SafeAreaView style = {{flex:1, backgroundColor: "black"}}>
@@ -122,7 +122,7 @@ const ChatScreen = ({navigation, route}) => {
             >
                 <TouchableWithoutFeedback onPress = {Keyboard.dismiss}>
                 <>
-                    <ScrollView contentContainerStyle = {{paddingTop: 15}}>
+                    <ScrollView contentContainerStyle = {{paddingTop: 15}} ref={scrollRef} onContentSizeChange={() => scrollRef.current.scrollToEnd()}>
                         {messages.map(({id,data}) => (
                             data.email === auth.currentUser.email
                             ?

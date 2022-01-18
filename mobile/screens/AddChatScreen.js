@@ -4,6 +4,7 @@ import {Button, Input} from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome"; 
 import * as firebase from "firebase";
 import {auth, db} from "../firebase";
+import io from "socket.io-client"
 
 const AddChatScreen = ({navigation}) => {
     const [input, setInput] = useState("");
@@ -16,6 +17,11 @@ const AddChatScreen = ({navigation}) => {
     }, [navigation]);
 
     const createChat = async () => {
+        const socket = io("http://192.168.1.71:3000/");
+        socket.connect();
+        socket.emit("Join-room",input);
+
+        
         await db
         .collection('chats')
         .add({
@@ -26,6 +32,9 @@ const AddChatScreen = ({navigation}) => {
             navigation.goBack();
         })
         .catch((error) => alert(error));
+
+        
+        
     };
 
     return (

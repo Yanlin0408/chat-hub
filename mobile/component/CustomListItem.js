@@ -34,6 +34,7 @@ const CustomListItem = ({id, chatName, lastTime, lastMessage, lastPic, enterChat
                 {
                     (moment(lastTime).endOf('day').fromNow() === "a day ago")
                     ?
+                    /* <ListItem.Title right>{lastTime.toLocalString()}</ListItem.Title> */
                     <ListItem.Title right>{moment(lastTime).format('ll')}</ListItem.Title>
                     :
                     <ListItem.Title right >{moment(lastTime).calendar()}</ListItem.Title>

@@ -10,6 +10,7 @@ import AddChat from './screens/AddChatScreen';
 import ChatScreen from './screens/ChatScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DarkTheme from "./constant/darkTheme"
+// import Realm from "realm";
 import io from "socket.io-client"
 
 const Stack = createNativeStackNavigator();

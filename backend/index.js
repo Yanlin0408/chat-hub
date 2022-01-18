@@ -11,6 +11,24 @@ io.on("connection", socket => {
         console.log(message);
     });
 
+    socket.on("user", (name) => {
+        console.log("--- user info")
+        console.log(name)
+        console.log(socket.id);
+    })
+
+    socket.on("Join-room", (roomName) => {
+        socket.join(roomName)
+        console.log("room name is", roomName);
+        console.log("socket id is ", socket.id);
+    })
+
+    socket.on("send-message", (message, room) => {
+        socket.to(room).emit("receive-message",message)
+        console.log(message);
+        console.log(room);
+        console.log("---")
+    })
 })
 
 server.listen(3000, ()=>{
