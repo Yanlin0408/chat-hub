@@ -9,6 +9,8 @@ import { auth, db } from "../firebase";
 import uuid from 'react-native-uuid';
 import { Logs } from 'expo'
 import {ws} from "../ws"
+import moment from "moment";
+import { Socket } from 'socket.io-client';
 
 Logs.enableExpoCliLogging()
 
@@ -56,6 +58,15 @@ const ChatScreen = ({navigation, route}) => {
         });
     }, [navigation, messages]);
 
+    useEffect(() => {
+        ws.emit("Join-room",route.params.chatName,auth.currentUser.displayName);
+    
+      return () => {
+        ws.removeAllListeners("Join-room")
+      };
+    }, []);
+    
+
     const sendMessage = (msg) => {
         Keyboard.dismiss();  
         ws.emit("send-message", route.params.chatName,msg);
@@ -84,24 +95,18 @@ const ChatScreen = ({navigation, route}) => {
 
     const receiveListener = (msg) =>  {
         setMessages([...messages,msg]);
-        console.log("+++++++++++",msg);
     }
     // if we choose to render chat messages from local storage
     // read: load from AsyncStorage
     // written: store to AsyncStorage locally 
     //          and store whatever msg emitted from socket io
     useEffect(() => {
-        // socket.emit("Join-room", route.params.chatName,auth.currentUser.displayName);
-        ws.emit("Join-room",route.params.chatName,auth.currentUser.displayName)
-        // socket.emit("send-message", route.params.chatName,input);
-
         // setMessages 
         ws.on("receive-message",receiveListener);
         // AsyncStorage (the whole useState)
 
         return () => {
             ws.off("receive-message",receiveListener)
-            console.log("_____ cleaned bithc off")
         };
     }, [messages]);
 
@@ -134,6 +139,11 @@ const ChatScreen = ({navigation, route}) => {
     //     return unsubscribe;
     // }, [route]);
 
+    function parseDate(input) {
+        var parts = input.match(/(\d+)/g);
+        // new Date(year, month [, date [, hours[, minutes[, seconds[, ms]]]]])
+        return new Date(parts[0], parts[1]-1, parts[2]); // months are 0-based
+      }
 
     const scrollRef = useRef();
 
@@ -148,15 +158,22 @@ const ChatScreen = ({navigation, route}) => {
                 <TouchableWithoutFeedback onPress = {Keyboard.dismiss}>
                 <>
                     <ScrollView contentContainerStyle = {{paddingTop: 15}} ref={scrollRef} onContentSizeChange={() => scrollRef.current.scrollToEnd()}>
-                        {messages.map(({id,data}) => (
+                        {messages.map(({id,data},index,array) => (
+                            
                             data.email === auth.currentUser.email
                             ?
+                            
                             <View key = {id} style = {styles.receiver}>
+                                {(index-1 >= 0 && (Math.abs(Date.parse(array[index].data.date) - Date.parse(array[index-1].data.date))/(60*1000))>3)? <Text style = {styles.dateStyle}>{moment(array[index].data.date).calendar()}</Text> : null }
+                                {/* <Text>{parseDate(array[index].data.date).getFullYear()}</Text> */}
+                                {/* <Text>{Date.parse(array[index].data.date)}</Text> */}
                                 <Avatar source = {{uri: data.photoURL}} size = {40} position = "absolute" top = {0} right = {"-15%"}/>
                                 <Text style={styles.receiverText}>{data.message}</Text>
                             </View>
                             :
+                            
                             <View position = "relative" key = {id} style = {styles.sender}>
+                            {(index-1 >= 0 && (Math.abs(Date.parse(array[index].data.date) - Date.parse(array[index-1].data.date))/(60*1000))>3)? <Text style = {styles.dateStyle}>{moment(array[index].data.date).calendar()}</Text> : null }
                                 <Avatar source = {{uri: data.photoURL}} size = {40} position = "absolute" top = {-25} left = {"-15%"}/>
                                 <View >
                                 <Text  style={styles.senderName}>{data.displayName}</Text>
@@ -170,28 +187,30 @@ const ChatScreen = ({navigation, route}) => {
                             value = {input}
                             onChangeText = {(text) => setInput(text)}
                             onSubmitEditing = {() => sendMessage({
-            id: uuid.v4(),
-            data: {
-                message: input,
-                date: Date(),
-                email: auth.currentUser.email,
-                photoURL: auth.currentUser.photoURL,
-            },
-        })}
+                                                                    id: uuid.v4(),
+                                                                    data: {
+                                                                        message: input,
+                                                                        date: Date(),
+                                                                        email: auth.currentUser.email,
+                                                                        photoURL: auth.currentUser.photoURL,
+                                                                        displayName: auth.currentUser.displayName,
+                                                                    },
+                                                                })}
                             placeholder = " chathub message"
                             // placeholder = {route.params.chatData}
                             style = {styles.textInput}
                         />
                         <TouchableOpacity
                             onPress={() => sendMessage({
-            id: uuid.v4(),
-            data: {
-                message: input,
-                date: Date(),
-                email: auth.currentUser.email,
-                photoURL: auth.currentUser.photoURL,
-            },
-        })}
+                                                        id: uuid.v4(),
+                                                        data: {
+                                                            message: input,
+                                                            date: Date(),
+                                                            email: auth.currentUser.email,
+                                                            photoURL: auth.currentUser.photoURL,
+                                                            displayName: auth.currentUser.displayName,
+                                                        },
+                                                    })}
                             activeOpacity={0.5}
                         >
                             <Ionicons name="send" size={24} color={DarkTheme.orange}/>
@@ -211,6 +230,9 @@ const styles = StyleSheet.create({
     receiverText: {
         color: "white",
         padding: 10,
+        position: "relative",
+        // position: "absolute",
+        marginLeft: 1,
     },
     receiver: {
         backgroundColor: DarkTheme.orange,
@@ -222,6 +244,12 @@ const styles = StyleSheet.create({
         marginTop: 10,
         maxWidth: "80%",
         position: "relative",
+    },
+    dateStyle: {
+        position: "relative",
+        color: "white",
+        marginLeft: 1,
+        bottom: 20
     },
     senderName: {
         position: "relative",
@@ -268,5 +296,5 @@ const styles = StyleSheet.create({
         padding: 10,
         color: DarkTheme.orange,
         borderRadius: 30,
-    },
+    }
 })
