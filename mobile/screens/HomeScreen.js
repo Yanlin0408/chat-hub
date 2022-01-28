@@ -1,12 +1,13 @@
 import React, {useLayoutEffect, useState, useEffect} from 'react'
-import { StyleSheet, Text, View, ScrollView,SafeAreaView,TouchableOpacity } from 'react-native'
+import { Pressable,Modal,StyleSheet, Text, View, ScrollView,SafeAreaView,TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-elements/dist/avatar/Avatar'
 import CustomListItem from '../component/CustomListItem'
 import DarkTheme from "../constant/darkTheme"
 import { AntDesign, SimpleLineIcons} from "@expo/vector-icons"
 import {auth, db} from "../firebase"
-import io from "socket.io-client"
 import { Logs } from 'expo'
+import {ws} from "../ws"
+
 
 const HomeScreen = ({navigation, route}) => {
     const [chats, setChats] = useState([]);
@@ -69,14 +70,15 @@ const HomeScreen = ({navigation, route}) => {
                 data: doc.data(),
             }))
         ));
-
-        const socket = io("http://192.168.1.71:3000/");
-        socket.connect();
-        socket.emit("user",auth?.currentUser?.displayName);
-        // socket.emit("user","rrr");
+        ws.connect();
+        ws.emit("user",auth?.currentUser?.displayName);
 
         return unsubscribe;
     }, []);
+
+    const deleteChat = async(id) => {
+        await db.collection('chats').doc(id).delete();
+    };
 
     return (
         <SafeAreaView>
@@ -87,7 +89,6 @@ const HomeScreen = ({navigation, route}) => {
                         id={chat.id} 
                         chatName={chat.data.chatName} 
                         lastPic = {chat.data.lastTimePic}
-                        // lastTime = {chat.data.lastTimeUpdate}"fuck"
                         lastTime = {
                             chat.data.lastTimeUpdate == null || chat.data.lastTimeUpdate == undefined
                             ?"fuck"
@@ -95,6 +96,10 @@ const HomeScreen = ({navigation, route}) => {
                         }
                         lastMessage = {chat.data.lastMessage}
                         enterChat = {enterChat}
+                        // setModalVisible = {setModalVisible}
+                        deleteChat = {deleteChat}
+                        // socket = {socket}
+                        // modalVisible = {modalVisible}
                     />
                 ))}
             </ScrollView>
@@ -105,6 +110,48 @@ const HomeScreen = ({navigation, route}) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+      },
+      modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+      },
+      button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        marginBottom: 5,
+      },
+      buttonOpen: {
+        backgroundColor: "#F194FF",
+      },
+      buttonClose: {
+        backgroundColor: "#2196F3",
+      },
+      textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+      },
     container: {
         height: "100%",
     }

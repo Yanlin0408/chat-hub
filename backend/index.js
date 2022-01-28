@@ -5,8 +5,10 @@ const server = http.createServer(app);
 const {Server} = require("socket.io");
 const io = new Server(server);
 
+const userList = {};
+
 io.on("connection", socket => {
-    console.log("a user connected :D");
+    console.log("a user connected :D ",socket.id);
     socket.on("yo", (message) => {
         console.log(message);
     });
@@ -17,13 +19,15 @@ io.on("connection", socket => {
         console.log(socket.id);
     })
 
-    socket.on("Join-room", (roomName) => {
+    socket.on("Join-room", (roomName,userName) => {
         socket.join(roomName)
+        console.log("______ join room _____");
         console.log("room name is", roomName);
-        console.log("socket id is ", socket.id);
+        console.log("username", userName);
+        userList[socket.id] = userName;
     })
 
-    socket.on("send-message", (message, room) => {
+    socket.on("send-message", (room, message) => {
         socket.to(room).emit("receive-message",message)
         console.log(message);
         console.log(room);
@@ -31,6 +35,6 @@ io.on("connection", socket => {
     })
 })
 
-server.listen(3000, ()=>{
+server.listen(3003, ()=>{
     console.log('listeoning on *:3000: ');
 })

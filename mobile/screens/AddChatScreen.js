@@ -9,14 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddChatScreen = ({navigation}) => {
     const [input, setInput] = useState("");
-    const [chats, setChats] = useState([
-        // {
-        // chatName: "bitch",
-        // lastTimeUpdate: Date()},
-        // {
-        //     chatName: "hoe",
-        //     lastTimeUpdate: Date()}
-    ]);
+    const [chats, setChats] = useState([]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -28,7 +21,6 @@ const AddChatScreen = ({navigation}) => {
     useEffect(() => {
         // clearAll();
         readChatsFromStorge();
-        // return () => {chats;}
     }, []);
 
     const clearAll = async () => {
@@ -87,7 +79,6 @@ const AddChatScreen = ({navigation}) => {
         socket.connect();
         socket.emit("Join-room",input);
 
-        
         await db
         .collection('chats')
         .add({
@@ -110,30 +101,6 @@ const AddChatScreen = ({navigation}) => {
                 lastTimeUpdate: stuff.date
             }
             ]);
-                
-            // useEffect(async() => {
-            //     console.log("----: ",chats);
-            //     const stringifiedChats = JSON.stringify({chats});
-            //     console.log("after stringify: ",stringifiedChats);
-            //     await AsyncStorage.setItem('@chatINAsync', stringifiedChats);
-            
-            // //   return () => {
-            // //     second;
-            // //   };
-            // }, [chats]);
-
-            // setTimeout(() => {
-            //     console.log("----: ",chats);
-            //     // const stringifiedChats = JSON.stringify({chats});
-                
-
-            //     setTimeout(async() => {
-            //         const stringifiedChats = JSON.stringify({chats});
-            //         console.log("after stringify: ",stringifiedChats);
-            //         await AsyncStorage.setItem('@chatINAsync', stringifiedChats);
-            //     }, 500);
-
-            // }, 100);
         } catch(e) {
             console.log("fuck");
             alert(e)
@@ -154,9 +121,6 @@ const AddChatScreen = ({navigation}) => {
                 }
             />
             <Button disabled = {!input} onPress={()=>createChat({content:input,date:Date()})} title = "Create new Chat"/>
-            
-            {/* {Object.values(chats).map((chat) => 
-            (<Text>{chat.chatName}</Text>))} */}
             {
                 chats.map((chat) => ( 
                     chat != null 

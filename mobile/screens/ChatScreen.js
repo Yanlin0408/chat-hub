@@ -4,20 +4,20 @@ import { Avatar } from 'react-native-elements/dist/avatar/Avatar';
 import { AntDesign, SimpleLineIcons, Ionicons} from "@expo/vector-icons"
 import { StatusBar } from 'expo-status-bar';
 import DarkTheme from "../constant/darkTheme"
-import io from "socket.io-client"
 import * as firebase from "firebase";
 import { auth, db } from "../firebase";
+import uuid from 'react-native-uuid';
 import { Logs } from 'expo'
-// import firebase from 'firebase';
+import {ws} from "../ws"
 
 Logs.enableExpoCliLogging()
+
 const ChatScreen = ({navigation, route}) => {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState([]);
 
-    
-
     useLayoutEffect(() => {
+
         navigation.setOptions({
             title: "Chat",
             headerBackTitleVisible: false,
@@ -56,8 +56,10 @@ const ChatScreen = ({navigation, route}) => {
         });
     }, [navigation, messages]);
 
-    const sendMessage = () => {
+    const sendMessage = (msg) => {
         Keyboard.dismiss();  
+        ws.emit("send-message", route.params.chatName,msg);
+        setMessages([...messages,msg]);
 
         // update field in "message"
         db.collection('chats').doc(route.params.id).collection('messages').add({
@@ -80,34 +82,57 @@ const ChatScreen = ({navigation, route}) => {
         setInput('');
     };
 
-        // if we choose to render chat messages from onSnapshot
+    const receiveListener = (msg) =>  {
+        setMessages([...messages,msg]);
+        console.log("+++++++++++",msg);
+    }
+    // if we choose to render chat messages from local storage
+    // read: load from AsyncStorage
+    // written: store to AsyncStorage locally 
+    //          and store whatever msg emitted from socket io
     useEffect(() => {
-        const unsubscribe = db
-        .collection("chats")
-        .doc(route.params.id)
-        .collection("messages")
-        .orderBy("timestamp","asc")
-        .onSnapshot((snapshot) => 
-            setMessages(
-                //chats is set to be objects referring to every doc in snapshot
-                snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    data: doc.data(),
-                }))
-            )
-        ); 
+        // socket.emit("Join-room", route.params.chatName,auth.currentUser.displayName);
+        ws.emit("Join-room",route.params.chatName,auth.currentUser.displayName)
+        // socket.emit("send-message", route.params.chatName,input);
+
+        // setMessages 
+        ws.on("receive-message",receiveListener);
+        // AsyncStorage (the whole useState)
+
+        return () => {
+            ws.off("receive-message",receiveListener)
+            console.log("_____ cleaned bithc off")
+        };
+    }, [messages]);
+
+    // if we choose to render chat messages from onSnapshot
+    // useEffect(() => {
+    //     const unsubscribe = db
+    //     .collection("chats")
+    //     .doc(route.params.id)
+    //     .collection("messages")
+    //     .orderBy("timestamp","asc")
+    //     .onSnapshot((snapshot) => 
+    //         setMessages(
+    //             //chats is set to be objects referring to every doc in snapshot
+    //             snapshot.docs.map((doc) => ({
+    //                 id: doc.id,
+    //                 data: doc.data(),
+    //             }))
+    //         )
+    //     ); 
         
-        // 在这，如果想读完数据之后再 unsubscribe, 
-        // 直接呼叫 unsubscribe 不行，因为都是同步，
-        // unsubscribe 不会等我们拿到 onSnapshot 再执行
-        // 所以用 setTimeout, 把 unsubscribe 放入异步队列，就能把顺序设定好
+    //     // 在这，如果想读完数据之后再 unsubscribe, 
+    //     // 直接呼叫 unsubscribe 不行，因为都是同步，
+    //     // unsubscribe 不会等我们拿到 onSnapshot 再执行
+    //     // 所以用 setTimeout, 把 unsubscribe 放入异步队列，就能把顺序设定好
 
-        // setTimeout(() => {
-        //     unsubscribe();
-        // }, 2000);
+    //     // setTimeout(() => {
+    //     //     unsubscribe();
+    //     // }, 2000);
 
-        return unsubscribe;
-    }, [route]);
+    //     return unsubscribe;
+    // }, [route]);
 
 
     const scrollRef = useRef();
@@ -144,13 +169,29 @@ const ChatScreen = ({navigation, route}) => {
                         <TextInput 
                             value = {input}
                             onChangeText = {(text) => setInput(text)}
-                            onSubmitEditing = {sendMessage}
+                            onSubmitEditing = {() => sendMessage({
+            id: uuid.v4(),
+            data: {
+                message: input,
+                date: Date(),
+                email: auth.currentUser.email,
+                photoURL: auth.currentUser.photoURL,
+            },
+        })}
                             placeholder = " chathub message"
                             // placeholder = {route.params.chatData}
                             style = {styles.textInput}
                         />
                         <TouchableOpacity
-                            onPress={sendMessage}
+                            onPress={() => sendMessage({
+            id: uuid.v4(),
+            data: {
+                message: input,
+                date: Date(),
+                email: auth.currentUser.email,
+                photoURL: auth.currentUser.photoURL,
+            },
+        })}
                             activeOpacity={0.5}
                         >
                             <Ionicons name="send" size={24} color={DarkTheme.orange}/>
@@ -170,7 +211,6 @@ const styles = StyleSheet.create({
     receiverText: {
         color: "white",
         padding: 10,
-        // paddingTop: 20,
     },
     receiver: {
         backgroundColor: DarkTheme.orange,
