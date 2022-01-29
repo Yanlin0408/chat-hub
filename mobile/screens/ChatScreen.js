@@ -139,12 +139,6 @@ const ChatScreen = ({navigation, route}) => {
     //     return unsubscribe;
     // }, [route]);
 
-    function parseDate(input) {
-        var parts = input.match(/(\d+)/g);
-        // new Date(year, month [, date [, hours[, minutes[, seconds[, ms]]]]])
-        return new Date(parts[0], parts[1]-1, parts[2]); // months are 0-based
-      }
-
     const scrollRef = useRef();
 
     return (
@@ -163,21 +157,31 @@ const ChatScreen = ({navigation, route}) => {
                             data.email === auth.currentUser.email
                             ?
                             
-                            <View key = {id} style = {styles.receiver}>
-                                {(index-1 >= 0 && (Math.abs(Date.parse(array[index].data.date) - Date.parse(array[index-1].data.date))/(60*1000))>3)? <Text style = {styles.dateStyle}>{moment(array[index].data.date).calendar()}</Text> : null }
+                            <View key = {id} >
+                                {(index-1 >= 0 && (Math.abs(Date.parse(array[index].data.date) - Date.parse(array[index-1].data.date))/(60*1000))>0.5)
+                                ? 
+                                <Text style = {styles.dateStyle}>{moment(array[index].data.date).calendar()}</Text> 
+                                : 
+                                null }
                                 {/* <Text>{parseDate(array[index].data.date).getFullYear()}</Text> */}
                                 {/* <Text>{Date.parse(array[index].data.date)}</Text> */}
-                                <Avatar source = {{uri: data.photoURL}} size = {40} position = "absolute" top = {0} right = {"-15%"}/>
-                                <Text style={styles.receiverText}>{data.message}</Text>
+                                <View style = {styles.receiver}>
+                                    <Avatar source = {{uri: data.photoURL}} size = {40} position = "absolute" top = {0} right = {"-15%"}/>
+                                    <Text style={styles.receiverText}>{data.message}</Text>
+                                </View>
+                                
                             </View>
                             :
-                            
-                            <View position = "relative" key = {id} style = {styles.sender}>
-                            {(index-1 >= 0 && (Math.abs(Date.parse(array[index].data.date) - Date.parse(array[index-1].data.date))/(60*1000))>3)? <Text style = {styles.dateStyle}>{moment(array[index].data.date).calendar()}</Text> : null }
-                                <Avatar source = {{uri: data.photoURL}} size = {40} position = "absolute" top = {-25} left = {"-15%"}/>
-                                <View >
-                                <Text  style={styles.senderName}>{data.displayName}</Text>
-                                <Text style={styles.senderText}>{data.message}</Text>
+                            <View position = "relative" key = {id} >
+                                {(index-1 >= 0 && (Math.abs(Date.parse(array[index].data.date) - Date.parse(array[index-1].data.date))/(60*1000))>0.5)
+                                ? 
+                                <Text style = {styles.dateStyle}>{moment(array[index].data.date).calendar()}</Text> 
+                                : 
+                                null}
+                                <View style = {styles.sender}>
+                                    <Avatar source = {{uri: data.photoURL}} size = {40} position = "absolute" top = {-25} left = {"-15%"}/>
+                                    <Text  style={styles.senderName}>{data.displayName}</Text>
+                                    <Text style={styles.senderText}>{data.message}</Text>
                                 </View>
                             </View>
                         ))}
@@ -231,7 +235,6 @@ const styles = StyleSheet.create({
         color: "white",
         padding: 10,
         position: "relative",
-        // position: "absolute",
         marginLeft: 1,
     },
     receiver: {
@@ -248,8 +251,8 @@ const styles = StyleSheet.create({
     dateStyle: {
         position: "relative",
         color: "white",
-        marginLeft: 1,
-        bottom: 20
+        textAlign: 'center',
+        paddingVertical: 4,
     },
     senderName: {
         position: "relative",

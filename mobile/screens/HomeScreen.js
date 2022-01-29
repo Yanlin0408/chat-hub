@@ -35,7 +35,7 @@ const HomeScreen = ({navigation, route}) => {
                 <View style={{ marginLeft: 5}}>
                     <TouchableOpacity onPress={signOutUser} activeOpacity={0.5}>
                         <Avatar rounded source={{uri: auth?.currentUser?.photoURL}}/>
-                        <Text>{auth?.currentUser?.displayName}</Text>
+                        <Text style={{color:DarkTheme.white}}>{auth?.currentUser?.displayName}</Text>
                     </TouchableOpacity>
                 </View>
             ),
@@ -48,7 +48,7 @@ const HomeScreen = ({navigation, route}) => {
                     marginRight: 20,
                 }}>
                     <TouchableOpacity activeOpacity={0.5}>
-                        <AntDesign name='camerao' size={24} color = 'white' style={{ marginLeft: 25}}/>
+                        <AntDesign name='camerao' style={{color:DarkTheme.orange}} size={24} color = 'white' style={{ marginLeft: 25}}/>
                     </TouchableOpacity>
                     <TouchableOpacity 
                         onPress={() => navigation.navigate("AddChat")}
@@ -110,48 +110,6 @@ const HomeScreen = ({navigation, route}) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-    centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 22
-      },
-      modalView: {
-        margin: 20,
-        backgroundColor: "white",
-        borderRadius: 20,
-        padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5
-      },
-      button: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-        marginBottom: 5,
-      },
-      buttonOpen: {
-        backgroundColor: "#F194FF",
-      },
-      buttonClose: {
-        backgroundColor: "#2196F3",
-      },
-      textStyle: {
-        color: "white",
-        fontWeight: "bold",
-        textAlign: "center"
-      },
-      modalText: {
-        marginBottom: 15,
-        textAlign: "center"
-      },
     container: {
         height: "100%",
     }

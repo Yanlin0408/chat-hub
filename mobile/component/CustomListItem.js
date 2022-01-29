@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Pressable,Modal,StyleSheet, Text, View } from 'react-native';
 import { ListItem, Avatar,Button } from 'react-native-elements';
 import moment from "moment";
+import DarkTheme from "../constant/darkTheme"
 import { Logs } from 'expo'
 
 const CustomListItem = ({id, chatName, lastTime, lastMessage, lastPic, enterChat,deleteChat}) => {
@@ -9,7 +10,7 @@ const CustomListItem = ({id, chatName, lastTime, lastMessage, lastPic, enterChat
     const [modalVisible, setModalVisible] = useState(false);
 
     return (
-        <View>
+        <View style = {styles.ItemStyle}>
                     <Modal
                         animationType="slide"
                         transparent={true}
@@ -45,39 +46,44 @@ const CustomListItem = ({id, chatName, lastTime, lastMessage, lastPic, enterChat
                         </View>
                         </View>
                     </Modal>
-        <ListItem 
-            key={id} 
-            bottomDivider
-            onPress = {() => enterChat(id, chatName)}
-            onLongPress = {() => setModalVisible(true)}
-        >
-            <Avatar
-                rounded
-                size = "medium"
-                source = {{
-                    uri:
-                    lastPic
-                    ?lastPic
-                    :"https://cdn.iconscout.com/icon/premium/png-256-thumb/chat-2469467-2043406.png",
-                }}
-        />
-                <ListItem.Content>
-                <ListItem.Title style={{fontWeight:"800"}}>
-                    {chatName}
-                </ListItem.Title>
-                <ListItem.Subtitle>{lastMessage}</ListItem.Subtitle>
-                </ListItem.Content>
-                <ListItem.Content right >
-                {
-                    (moment(lastTime).endOf('day').fromNow() === "a day ago")
-                    ?
-                    /* <ListItem.Title right>{lastTime.toLocalString()}</ListItem.Title> */
-                    <ListItem.Title right>{moment(lastTime).format('ll')}</ListItem.Title>
-                    :
-                    <ListItem.Title right >{moment(lastTime).calendar()}</ListItem.Title>
-                }
-                </ListItem.Content>
-        </ListItem>   
+          <ListItem 
+              key={id} 
+              // bottomDivider
+              onPress = {() => enterChat(id, chatName)}
+              onLongPress = {() => setModalVisible(true)}
+              containerStyle={{
+                    // colors: DarkTheme.grey,
+                    marginVertical: 0.5,
+                    backgroundColor: DarkTheme.black,
+                  }}
+          >
+              <Avatar
+                  rounded
+                  size = "medium"
+                  source = {{
+                      uri:
+                      lastPic
+                      ?lastPic
+                      :"https://cdn.iconscout.com/icon/premium/png-256-thumb/chat-2469467-2043406.png",
+                  }}
+              />
+                  <ListItem.Content>
+                  <ListItem.Title style={{fontWeight:"900",color:DarkTheme.orange,fontWeight: 'bold',fontSize: 18}}>
+                      {chatName}
+                  </ListItem.Title>
+                  <ListItem.Subtitle style={{color:DarkTheme.white}}>{lastMessage}</ListItem.Subtitle>
+                  </ListItem.Content>
+                  <ListItem.Content right >
+                  {
+                      (moment(lastTime).endOf('day').fromNow() === "a day ago")
+                      ?
+                      /* <ListItem.Title right>{lastTime.toLocalString()}</ListItem.Title> */
+                      <ListItem.Title right style={{color:DarkTheme.white,fontSize:15}}>{moment(lastTime).format('ll')}</ListItem.Title>
+                      :
+                      <ListItem.Title right style={{color:DarkTheme.white,fontSize:14}}>{moment(lastTime).calendar()}</ListItem.Title>
+                  }
+                  </ListItem.Content>
+          </ListItem>   
         </View>       
     )
 }
@@ -85,6 +91,9 @@ const CustomListItem = ({id, chatName, lastTime, lastMessage, lastPic, enterChat
 export default CustomListItem
 
 const styles = StyleSheet.create({
+    ItemStyle:{
+      backgroundColor: DarkTheme.grey,
+    },
     centeredView: {
         flex: 1,
         justifyContent: "center",

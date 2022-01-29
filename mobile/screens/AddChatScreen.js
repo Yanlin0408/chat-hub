@@ -42,10 +42,6 @@ const AddChatScreen = ({navigation}) => {
             setTimeout(() => {
                 console.log("============== read in");
                 console.log("item from async store: ",chatObject);
-                // setChats(JSON.parse(chatObject)); 
-                // setChats([...chats, JSON.parse(chatObject)])
-
-                //这里到底怎么了
                 chatObject != null ? setChats(JSON.parse(chatObject).chats) : console.log("--fuck");
                 setTimeout(() => {
                     console.log("all chat, ",chats);
