@@ -10,7 +10,7 @@ import uuid from 'react-native-uuid';
 import { Logs } from 'expo'
 import {ws} from "../ws"
 import moment from "moment";
-import { Socket } from 'socket.io-client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 Logs.enableExpoCliLogging()
 
@@ -60,12 +60,34 @@ const ChatScreen = ({navigation, route}) => {
 
     useEffect(() => {
         ws.emit("Join-room",route.params.chatName,auth.currentUser.displayName);
-    
+        readMessagesFromStorge();
+
       return () => {
         ws.removeAllListeners("Join-room")
       };
     }, []);
     
+    const readMessagesFromStorge = async () => {
+        try{
+            const chatObject = await AsyncStorage.getItem(`@${route.params.chatName}`);
+            chatObject != null ? JSON.parse(chatObject) : null;
+
+            setTimeout(() => {
+                console.log("============== read in");
+                console.log("item from async store: ",chatObject);
+                chatObject != null ? setMessages(JSON.parse(chatObject).messages) : console.log("--fuck");
+                setTimeout(() => {
+                    console.log("all chat, ",messages);
+                    console.log(typeof(messages));
+                    console.log("one from aysnc, ",chatObject);
+                    console.log("============== read done");
+                }, 200);
+                
+            }, 100);
+        } catch (e) {
+            alert(e);
+        } 
+    };
 
     const sendMessage = (msg) => {
         Keyboard.dismiss();  
@@ -93,8 +115,25 @@ const ChatScreen = ({navigation, route}) => {
         setInput('');
     };
 
+    const saveMsgs = async() => {
+        console.log("----: ",messages);
+        const stringifiedChats = JSON.stringify({messages});
+        console.log("after stringify: ",stringifiedChats);
+        await AsyncStorage.setItem(`@${route.params.chatName}`, stringifiedChats);
+    }
+
+    useEffect(
+        () => {
+            saveMsgs();
+            console.log("########   存信息")
+        }    
+    , [messages]);
+
     const receiveListener = (msg) =>  {
         setMessages([...messages,msg]);
+        // () => {
+        //     saveMsgs();
+        // }
     }
     // if we choose to render chat messages from local storage
     // read: load from AsyncStorage
@@ -104,6 +143,7 @@ const ChatScreen = ({navigation, route}) => {
         // setMessages 
         ws.on("receive-message",receiveListener);
         // AsyncStorage (the whole useState)
+        
 
         return () => {
             ws.off("receive-message",receiveListener)

@@ -53,8 +53,7 @@ const AddChatScreen = ({navigation}) => {
             }, 100);
         } catch (e) {
             alert(e);
-        }
-        
+        } 
     }
 
     const saveChat = async() => {
@@ -71,10 +70,6 @@ const AddChatScreen = ({navigation}) => {
     , [chats]);
 
     const createChat = async (stuff) => {
-        const socket = io("http://192.168.1.71:3000/");
-        socket.connect();
-        socket.emit("Join-room",input);
-
         await db
         .collection('chats')
         .add({
@@ -82,11 +77,10 @@ const AddChatScreen = ({navigation}) => {
             lastTimeUpdate: firebase.firestore.FieldValue.serverTimestamp(),
 
         })
-        // .then(() => {
-        //     navigation.goBack();
-        // })
-        // .catch((error) => alert(error));
-
+        .then(() => {
+            navigation.goBack();
+        })
+        .catch((error) => alert(error));
 
         // store chat in local Asyncstorage
         try {
@@ -101,8 +95,6 @@ const AddChatScreen = ({navigation}) => {
             console.log("fuck");
             alert(e)
         }
-        
-        
     };
 
     return (
