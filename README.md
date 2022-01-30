@@ -14,27 +14,20 @@
 ## Installation
 
 ### Run Frontend Locally:
-* $ git clone https://github.com/UAACC/404-project.git frontend<br/>
-* $ cd frontend<br/>
-* $ git fetch origin<br/>
-* $ git checkout frontend<br/>
-* $ cd client<br/>
+* $ git clone https://github.com/Yanlin0408/My_Kijiji_Clone.git <br/>
+* $ cd mobile<br/>
 * $ npm install<br/>
-* $ npm run start<br/>
-* $ Open frontend URL: http://127.0.0.1:3000/ <br/>
+* $ expo start<br/>
+* $ Click "Run on Android/emulator"<br/>
+* $ Or download Expo go on physical device and Scan QR code<br/>
+// If your firewall is on ("Something is wrong" on physical device is shown), 
+// you can run "expo start --tunnel" in step 4 instead
 
 ### Run Backend Locally:
-* $ git clone https://github.com/UAACC/404-project.git backend<br/>
+* $ Split terminal<br/>
 * $ cd backend<br/>
-* $ git fetch<br/>
-* $ git checkout backend<br/>
-// optional: use your VM<br/>
-* $ pip install -r requirements.txt
-* $ python manage.py makemigrations<br/>
-* $ python manage.py migrate<br/>
-* $ python manage.py migrate --run-syncdb<br/>
-* $ python manage.py runserver<br/>
-* $ Open backend URL: http:/127.0.0.1:8000/admin/ <br/>
+* $ npm install<br/>
+* $ nodemon index.js<br/>
 
 ## Update
 
