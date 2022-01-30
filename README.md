@@ -20,8 +20,7 @@
 * $ expo start<br/>
 * $ Click "Run on Android/emulator"<br/>
 * $ Or download Expo go on physical device and Scan QR code<br/>
-// If your firewall is on ("Something is wrong" on physical device is shown), 
-// you can run "expo start --tunnel" in step 4 instead
+// If your firewall is on ("Something is wrong" on physical device is shown), you can run "expo start --tunnel" in step 4 instead
 
 ### Run Backend Locally:
 * $ Split terminal<br/>
