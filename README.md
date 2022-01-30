@@ -11,6 +11,31 @@
 5. Dev tools: Github, Android Studio, Expo
 6. UI library: React Native Elements, React Navigation
 
+## Installation
+
+### Run Frontend Locally:
+* $ git clone https://github.com/UAACC/404-project.git frontend<br/>
+* $ cd frontend<br/>
+* $ git fetch origin<br/>
+* $ git checkout frontend<br/>
+* $ cd client<br/>
+* $ npm install<br/>
+* $ npm run start<br/>
+* $ Open frontend URL: http://127.0.0.1:3000/ <br/>
+
+### Run Backend Locally:
+* $ git clone https://github.com/UAACC/404-project.git backend<br/>
+* $ cd backend<br/>
+* $ git fetch<br/>
+* $ git checkout backend<br/>
+// optional: use your VM<br/>
+* $ pip install -r requirements.txt
+* $ python manage.py makemigrations<br/>
+* $ python manage.py migrate<br/>
+* $ python manage.py migrate --run-syncdb<br/>
+* $ python manage.py runserver<br/>
+* $ Open backend URL: http:/127.0.0.1:8000/admin/ <br/>
+
 ## Update
 
 # 2022.01.29 V 1.2
