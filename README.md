@@ -2,6 +2,8 @@
 
 ## Description: Chat-hub is a chat app, supported by local storage, online database and redis cache
 
+![alt text](https://github.com/Yanlin0408/chat-hub/blob/main/mobile/assets/demo.jpg?raw=true)
+
 ## Technology
 
 1. Frontend: React Native, Socket.io-client, Firebase
@@ -49,4 +51,4 @@
 4. consistent theme
 5. basic backend
 
-![alt text](https://github.com/Yanlin0408/chat-hub/blob/main/mobile/assets/demo.jpg?raw=true)
+
