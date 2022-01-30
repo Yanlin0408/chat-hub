@@ -49,4 +49,4 @@
 4. consistent theme
 5. basic backend
 
-![alt text](https://github.com/Yanlin0408/chat-hub/blob/main/mobile/assets/covering.jpg?raw=true)
+![alt text](https://github.com/Yanlin0408/chat-hub/blob/main/mobile/assets/demo.jpg?raw=true)
