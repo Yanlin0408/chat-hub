@@ -36,7 +36,7 @@
 
 1. AsyncStorage
 2. chat based on socket.io
-3. popup
+3. popup for long press
 
 # 2022.01.08 V 1.1
 
